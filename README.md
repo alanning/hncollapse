@@ -2,6 +2,7 @@
 
 Collapsible comments for Hacker News
 
+<img src="http://i.imgur.com/GQtFmv2l.png" title="hncollapse screenshot" />
 
 ## Repo description:
 
