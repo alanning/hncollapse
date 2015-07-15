@@ -5,9 +5,13 @@ Collapsible comments for Hacker News
 
 ## Repo description:
 
+```
   hncollapse.user.js - User Script that can be used in Firefox/Greasemonkey.
-  hn-sample.html - An example of a HN comments page which has `hncollapse.user.js` loaded (via script tag in body)
+  
+  hn-sample.html - An example of a HN comments page which has `hncollapse.user.js` already loaded (via script tag in body)
+  
   webserver.py - Simple webserver that can be used to test the script locally.
+```
 
 
 ## Test locally:
@@ -33,4 +37,10 @@ Turn on debug output by setting the `DEBUG` variable to true in the script.
 
 ## Documentation
 
-All functions used in this repo are documented.  Run `yuidoc --server` in the repo directory or just check out the `docs` directory.
+All functions used in this repo are documented.
+Run `yuidoc --server` in the repo directory or just check out the `docs` directory.
+
+To install [yuidoc](http://yui.github.io/yuidoc/):
+
+1. Download and install Node.js
+2. Run `npm -g install yuidocjs`
