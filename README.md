@@ -17,7 +17,6 @@ Collapsible comments for Hacker News
 ## Test locally:
 
 ```
-$ cd tmp
 $ git clone https://github.com/alanning/hncollapse.git
 $ cd hncollapse
 $ python webserver.py
