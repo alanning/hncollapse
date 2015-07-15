@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>hncollapse.user.js - hncollapse</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="hncollapse"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: v0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/CSS.html">CSS</a></li>
+            
+                <li><a href="../classes/hncollapse.html">hncollapse</a></li>
+            
+                <li><a href="../classes/Util.html">Util</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/hncollapse.html">hncollapse</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: hncollapse.user.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+// Copyright (c) 2015, Adrian Lanning
+// Released under the GPLv3 license
+// http://www.gnu.org/licenses/gpl.html
+
+// ==UserScript==
+// @name           hncollapse
+// @namespace      https://github.com/alanning
+// @description    Collapsible comments for Hacker News
+// @include        https://news.ycombinator.com/item*
+// @license        GPLv3
+// @grant          none
+// @version        0.1
+// ==/UserScript==
+
+;(function () {
+
+&quot;use strict&quot;
+
+/**
+ * @module hncollapse
+ * @class hncollapse
+ */
+
+var DEBUG = false,
+    forEach = function (a, b) { a &amp;&amp; Array.prototype.forEach.call(a, b); },
+    filter = function (a, b) {return Array.prototype.filter.call(a, b)},
+    map = function (a, b) {return Array.prototype.map.call(a, b)},
+    HNTRIGGER = &#x27;hncollapse-trigger&#x27;,
+    HNCOLLAPSED = &#x27;hncollapsed&#x27;,
+    COLLAPSED_COMMENT = &quot;tr.athing.hncollapsed&quot;,
+    TRIGGER_ID = &quot;data-hncollapsed-trigger-id&quot;,
+    PARENT_TRIGGER_ID = &quot;data-hncollapsed-trigger&quot;,
+    Util,
+    CSS
+
+
+/**
+ * Main startup function
+ *
+ * @method startup
+ */ 
+function startup () {
+  var commentHeaders
+
+  DEBUG &amp;&amp; console.log(&#x27;[hncollapse] startup&#x27;)
+
+  loadCSS()
+  
+  commentHeaders = getCommentHeaders()
+  DEBUG &amp;&amp; console.log(&quot;Found&quot;, commentHeaders.length, &quot;comment headers&quot;)
+  
+  addCollapseLinks (commentHeaders)
+  document.body.addEventListener(&#x27;click&#x27;, clickHandler)
+}
+
+
+
+/**
+ * Load required CSS styles
+ *
+ * @method loadCSS
+ */
+function loadCSS () {
+  var css = &quot;.hncollapse-trigger {cursor:pointer;}&quot; +
+            &quot;.hncollapsed {display:none;}&quot;
+
+  try {
+    CSS.addGlobalStyle(css)
+  } catch (ex) {
+    console &amp;&amp; console.error &amp;&amp;
+      console.error(&quot;[hncollapse] error loading css&quot;, ex)
+  }
+}
+
+/**
+ * Find all &#x60;comhead&#x60; comment header elements on the page.
+ * Ignores the one in the page title since it&#x27;s not a real comment.
+ *
+ * @method getCommentHeaders
+ */
+function getCommentHeaders () {
+  var commentHeaders = document.getElementsByClassName(&#x27;comhead&#x27;)
+
+  // ignore the one in the page title
+  commentHeaders = Array.prototype.slice.call(commentHeaders, 1)
+
+  return commentHeaders
+}
+
+/**
+ * Add a collapse &#x60;trigger&#x60; element to each comment header.
+ * i.e. &#x60;[-]&#x60;
+ *
+ * @method addCollapseLinks
+ * @param {Array} commentHeaders List of comment header elements
+ */
+function addCollapseLinks (commentHeaders) {
+  if (!commentHeaders) {
+    return
+  }
+
+  forEach(commentHeaders, function (head) {
+      var txt = document.createElement(&quot;span&quot;),
+          inner
+
+    inner = getTriggerText()
+
+    if (DEBUG) {
+      inner += &quot; &quot; + Util.getTop(head)
+    }
+
+    txt.innerHTML = inner
+    txt.className = HNTRIGGER
+
+    head.appendChild(txt)
+  })
+}
+
+/**
+ * The text to use for the collapse trigger.
+ *
+ * @method getTriggerText
+ * @param {Boolean} [collapsed] Is the comment in a collapsed state?
+ *                              Default: false
+ */
+function getTriggerText (collapsed) {
+  if (collapsed) {
+    return &quot;[+]&quot;
+  } else {
+    return &quot;[-]&quot;
+  }
+}
+
+/**
+ * Is the passed in element one of our trigger elements?
+ *
+ * @method isTriggerElement
+ * @param {Element} element HTML Element to test
+ * @return {Boolean} true if element is a trigger element
+ */
+function isTriggerElement (element) {
+  var classes,
+      i, len
+
+  if (!element || element.nodeName !== &quot;SPAN&quot;) {
+    return false
+  }
+
+  classes = element.className.split(&#x27; &#x27;)
+  for (i = 0, len = classes.length; i &lt; len; i++) {
+    if (HNTRIGGER === classes[i]) {
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
+ * Collapse or restore the clicked comment&#x27;s text.
+ *
+ * @method toggleClickedComment
+ * @param {Element} commentWrapper Outer-level TR Element that wraps the
+ *                                 clicked comment
+ * @param {Element} triggerElement The clicked element / collapse trigger
+ * @return {Boolean} true if the child comments should be collapsed, false
+ *                   if they should be displayed
+ */
+function toggleClickedComment (commentWrapper, triggerElement) {
+  var commentText,
+      ownReply,
+      collapsed
+
+  commentText = commentWrapper.querySelectorAll(&#x27;span.comment&#x27;)[0]
+  ownReply = commentWrapper.querySelectorAll(&#x27;div.reply&#x27;)[0]
+
+  CSS.toggleClass(commentText, HNCOLLAPSED)
+  CSS.toggleClass(ownReply, HNCOLLAPSED)
+
+  collapsed = CSS.hasClass(commentText, HNCOLLAPSED)
+  triggerElement.innerHTML = getTriggerText (collapsed)
+
+  return collapsed
+}
+
+/**
+ * Collapse the child comments of the target comment.
+ *
+ * Adds a unique id to the trigger element and to each collapsed comment
+ * so we can track which comments belong to which triggers.
+ *
+ * @method collapseChildComments
+ * @param {Element} targetComment Comment which user requested to collapse
+ * @param {Element} triggerElement Trigger element which user clicked
+ */
+function collapseChildComments (targetComment, triggerElement) {
+  var comments,
+      triggerId
+
+  comments = findChildComments(targetComment)
+
+  if (comments &amp;&amp; comments.length &gt; 0) {
+    triggerId = +(new Date())
+    triggerElement.setAttribute(TRIGGER_ID, triggerId)
+
+    forEach(comments, function (comment) {
+      comment.setAttribute(PARENT_TRIGGER_ID, triggerId)
+      comment.classList.add(HNCOLLAPSED)
+    })
+  }
+}
+
+/**
+ * Restore the child comments associated with the trigger element.
+ *
+ * Removes the unique id from the trigger element and any child comments.
+ *
+ * @method restoreChildComments
+ * @param {Element} triggerElement Trigger element which user clicked
+ */
+function restoreChildComments (triggerElement) {
+  var triggerId,
+      comments
+
+  // get the unique id from the trigger element
+  triggerId = triggerElement.getAttribute(TRIGGER_ID)
+  triggerElement.removeAttribute(TRIGGER_ID)
+
+  // find collapsed comments with matching id
+  comments = document.querySelectorAll(COLLAPSED_COMMENT)
+  forEach(comments, function (comment) {
+    var id = comment.getAttribute(PARENT_TRIGGER_ID)
+
+    if (id == triggerId) {
+      CSS.removeClass(comment, HNCOLLAPSED)
+      comment.removeAttribute(PARENT_TRIGGER_ID)
+    }
+  })
+}
+
+/**
+ * Delegate click handler which starts collapse or restore process when
+ * a trigger element is clicked.
+ *
+ * @method clickHandler
+ * @param {Event} evt
+ */
+function clickHandler (evt) {
+  var triggerElement,
+      targetComment,
+      hideChildComments
+
+  if (isTriggerElement(evt.target)) {
+    triggerElement = evt.target
+    // hide own comments
+    targetComment = Util.findParent(triggerElement, &quot;tr.athing&quot;)
+    hideChildComments = toggleClickedComment(targetComment, triggerElement)
+
+    // now handle any child comments
+    if (hideChildComments) {
+      collapseChildComments (targetComment, triggerElement)
+    } else {
+      restoreChildComments (triggerElement)
+    }
+  }
+}
+
+
+/**
+ * Get all child comments based on the passed in element.
+ *
+ * As of July 08, 2015, comments on HN are displayed in individual TR
+ * elements rather than nested within each other.  The &quot;nesting&quot; is
+ * solely controlled by a spacer element on the left of the TR which
+ * indents the content of the comment.
+ *
+ * This function:
+ *
+ * 1. finds all spacer elements
+ * 2. filters out any that are above the target comment
+ * 3. loops through in order and only keeps those that are of greater
+ *    indentation level than the target comment
+ * 4. returns the parent top-level TR&#x27;s for the remaining spacers
+ *
+ * The following structure is assumed:
+ *   &#x27;tr.athing&#x27; = Top-level HN comment wrapper
+ *   &#x27;td.ind&#x27;    = indentation / spacer element located inside wrapper
+ *
+ * @method findChildComments
+ * @param {Element} element An HTML Element that either _is_ the target
+ *                          comment&#x27;s TR wrapper or is an element within it.
+ * @return {Array} list of comments (TR&#x27;s) which are &quot;children&quot; of the target
+ *                 comment
+ */
+function findChildComments (element) {
+  var targetComment,
+      targetIndent,
+      targetWidth,
+      targetY = 2,  // empty spacer TD is 2 pixels wide
+      allIndents,
+      allIndentsAfterTarget,
+      indent,
+      childIndents = [],
+      childComments
+
+  if (element.tagName.toLowerCase() === &#x27;tr&#x27; &amp;&amp; CSS.hasClass(element, &#x27;athing&#x27;)) {
+    // element _is_ the target comment wrapper
+    targetComment = element
+  } else {
+    // assume element is within target comment wrapper
+    targetComment = Util.findParent(element, &#x27;tr.athing&#x27;)
+  }
+
+  if (!targetComment) {
+    return []
+  }
+
+  targetIndent = targetComment.querySelectorAll(&#x27;td.ind&#x27;)[0]
+  if (!targetIndent) {
+    return []
+  }
+
+  targetY = Util.getTop(targetIndent)
+  targetWidth = CSS.outerWidth(targetIndent)
+
+  DEBUG &amp;&amp; console.log(&#x27;target indent =&#x27;, targetWidth, &#x27; top =&#x27;, targetY)
+
+  allIndents = document.getElementsByClassName(&quot;ind&quot;)
+  //DEBUG &amp;&amp; Util.highlight(allIndents, &#x27;#888&#x27;)
+  //DEBUG &amp;&amp; console.log(&quot;allIndents = &quot;, allIndents.length)
+
+  allIndentsAfterTarget = filter(allIndents, function (elem) {
+    var t = Util.getTop(elem)
+
+    //DEBUG &amp;&amp; console.log(targetY, t, t &gt; targetY)
+    return t &gt; targetY
+  })
+  DEBUG &amp;&amp; console.log(&quot;allIndentsAfterTarget = &quot;, allIndentsAfterTarget.length)
+
+  DEBUG &amp;&amp; Util.highlight(allIndentsAfterTarget, &#x27;#888&#x27;)
+
+  for (var i = 0, len = allIndentsAfterTarget.length; i &lt; len; i++) {
+    indent = allIndentsAfterTarget[i]
+    if (CSS.outerWidth(indent) &gt; targetWidth) {
+      childIndents.push(indent)
+    } else {
+      break;
+    }
+  }
+
+  DEBUG &amp;&amp; Util.highlight(childIndents)
+
+  childComments = Util.findParent(childIndents, &quot;tr.athing&quot;)
+
+  //DEBUG &amp;&amp; Util.highlight(childComments)
+
+  return childComments
+}
+
+
+
+
+/**
+ * General helper functions
+ *
+ * @class Util
+ */
+Util = {
+
+  /**
+   * Get the absolute Y position of the target element
+   *
+   * @method getTop
+   * @param {Element} element
+   * @return {Number} Absolute Y position of the top of the element
+   */
+  getTop: function (element) {
+    return element.getBoundingClientRect().top + window.scrollY
+  },
+
+  /**
+   * Highlight the target element.
+   *
+   * @method highlight
+   * @param {Element} element
+   * @param {String} [color] Default: &#x27;blue&#x27;
+   */
+  highlight: function (element, color) {
+    color = color || &#x27;blue&#x27;
+
+    if (element) {
+      if (element.length) {
+        forEach(element, function (e) {
+          e.style = &quot;background-color:&quot; + color + &quot;;&quot;
+        })
+      } else {
+        element.style = &quot;background-color:&quot; + color + &quot;;&quot;
+      }
+    }
+  },
+
+  /**
+   * Return the parent element based on tagName.
+   * If a list is passed, return a list of parent elements treating
+   * each source element as if it had been passed individually.
+   *
+   * @method findParent
+   * @param {Element | NodeList} element The child element or list of
+   *                                     child elements
+   * @param {String} tagName HTML tag name of the parent element to find.
+   *                         May can also include a className to further
+   *                         refine search. ex. &quot;tr&quot;, &quot;tr.comment&quot;
+   * @return {Element | Array} parent element or list of parent elements.
+   *                           If none found, returns undefined or list
+   *                           of undefined
+   */
+  findParent: function (element, tagName) {
+    var found = false,
+        split,
+        className
+
+    if (element.length) {
+      // loop through each element in NodeList
+      return map(element, function (e) {
+        return Util.findParent(e, tagName)
+      })
+    } else {
+      if (-1 !== tagName.indexOf(&#x27;.&#x27;)) {
+        split = tagName.split(&#x27;.&#x27;)
+        tagName = split[0]
+        className = split[1]
+      }
+      tagName = tagName.toLowerCase()
+
+      while (element &amp;&amp; !found) {
+        element = element.parentNode
+
+        if (element &amp;&amp; element.tagName.toLowerCase() === tagName) {
+          if (className) {
+            if (element.classList.contains(className)) {
+              found = true
+            }
+          } else {
+            found = true
+          }
+        }
+      }
+
+      if (!found) {
+        return  // undefined
+      }
+
+      return element
+    }
+  }
+}  // end Util
+
+
+
+
+/**
+ * CSS Helpers
+ *
+ * mostly from: http://youmightnotneedjquery.com/
+ * @class CSS
+ */
+CSS = {
+
+  /**
+   * Check if an element has the specified CSS class.
+   *
+   * @method hasClass
+   * @param {Element} el
+   * @param {String} className
+   * @return {Boolean} true if element has specific class
+   */
+  hasClass: function (el, className) {
+    if (el.classList) {
+      return el.classList.contains(className)
+    } else {
+      return new RegExp(&#x27;(^| )&#x27; + className + &#x27;( |$)&#x27;, &#x27;gi&#x27;).test(el.className)
+    }  
+  },
+
+  /**
+   * Add the specified class to the target element.
+   *
+   * @method addClass
+   * @param {Element} el
+   * @param {String} className
+   */
+  addClass: function (el, className) {
+    if (el.classList) {
+      el.classList.add(className);
+    } else {
+      el.className += &#x27; &#x27; + className;
+    }
+  },
+
+  /**
+   * Remove the specified class from the target element.
+   *
+   * @method removeClass
+   * @param {Element} el
+   * @param {String} className
+   */
+  removeClass: function (el, className) {
+    if (el.classList) {
+      el.classList.remove(className)
+    } else {
+      el.className = el.className.replace(new RegExp(&#x27;(^|\\b)&#x27; + className.split(&#x27; &#x27;).join(&#x27;|&#x27;) + &#x27;(\\b|$)&#x27;, &#x27;gi&#x27;), &#x27; &#x27;)
+    }  
+  },
+
+  /**
+   * Toggle the specified CSS class.  If the element already has it, it is
+   * removed.  If not, it is added.
+   *
+   * @method toggleClass
+   * @param {Element} element
+   * @param {String} className
+   */
+  toggleClass: function (element, className) {
+    if (!element) {
+      return
+    }
+
+    if (CSS.hasClass(element, className)) {
+      CSS.removeClass(element, className)
+    } else {
+      CSS.addClass(element, className)
+    }
+  },
+
+  /**
+   * Get the &quot;outerWidth&quot; of an HTML element.
+   *
+   * @meteor outerWidth
+   * @param {Element} el
+   * @return {Number} offsetWidth + margins
+   */
+  outerWidth: function (el) {
+    var width = el.offsetWidth,
+        style = getComputedStyle(el);
+
+    width += parseInt(style.marginLeft) + parseInt(style.marginRight);
+    return width;
+  },
+
+  /**
+   * Add css to the page&#x27;s HEAD.
+   *
+   * @method addGlobalStyle
+   * @param {String} css
+   */
+  addGlobalStyle: function (css) {
+    var head,
+        style;
+
+    head = document.getElementsByTagName(&#x27;head&#x27;)[0];
+    if (!head) { return; }
+    style = document.createElement(&#x27;style&#x27;);
+    style.type = &#x27;text/css&#x27;;
+    style.innerHTML = css;
+    head.appendChild(style);
+  }
+}  // end CSS
+
+
+
+
+startup()
+
+})();
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

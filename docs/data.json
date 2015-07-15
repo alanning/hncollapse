@@ -1,0 +1,461 @@
+{
+    "project": {
+        "name": "hncollapse",
+        "description": "Collapsible comments for Hacker News",
+        "version": "v0.1"
+    },
+    "files": {
+        "hncollapse.user.js": {
+            "name": "hncollapse.user.js",
+            "modules": {
+                "hncollapse": 1
+            },
+            "classes": {
+                "hncollapse": 1,
+                "Util": 1,
+                "CSS": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "hncollapse": {
+            "name": "hncollapse",
+            "submodules": {},
+            "classes": {
+                "hncollapse": 1,
+                "Util": 1,
+                "CSS": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "hncollapse.user.js",
+            "line": 461
+        }
+    },
+    "classes": {
+        "hncollapse": {
+            "name": "hncollapse",
+            "shortname": "hncollapse",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "hncollapse",
+            "namespace": "",
+            "file": "hncollapse.user.js",
+            "line": 19
+        },
+        "Util": {
+            "name": "Util",
+            "shortname": "Util",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "hncollapse",
+            "namespace": "",
+            "file": "hncollapse.user.js",
+            "line": 363,
+            "description": "General helper functions"
+        },
+        "CSS": {
+            "name": "CSS",
+            "shortname": "CSS",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "hncollapse",
+            "namespace": "",
+            "file": "hncollapse.user.js",
+            "line": 461,
+            "description": "CSS Helpers\n\nmostly from: http://youmightnotneedjquery.com/"
+        }
+    },
+    "classitems": [
+        {
+            "file": "hncollapse.user.js",
+            "line": 37,
+            "description": "Main startup function",
+            "itemtype": "method",
+            "name": "startup",
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 58,
+            "description": "Load required CSS styles",
+            "itemtype": "method",
+            "name": "loadCSS",
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 75,
+            "description": "Find all `comhead` comment header elements on the page.\nIgnores the one in the page title since it's not a real comment.",
+            "itemtype": "method",
+            "name": "getCommentHeaders",
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 90,
+            "description": "Add a collapse `trigger` element to each comment header.\ni.e. `[-]`",
+            "itemtype": "method",
+            "name": "addCollapseLinks",
+            "params": [
+                {
+                    "name": "commentHeaders",
+                    "description": "List of comment header elements",
+                    "type": "Array"
+                }
+            ],
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 119,
+            "description": "The text to use for the collapse trigger.",
+            "itemtype": "method",
+            "name": "getTriggerText",
+            "params": [
+                {
+                    "name": "collapsed",
+                    "description": "Is the comment in a collapsed state?\n                             Default: false",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 134,
+            "description": "Is the passed in element one of our trigger elements?",
+            "itemtype": "method",
+            "name": "isTriggerElement",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "HTML Element to test",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "true if element is a trigger element",
+                "type": "Boolean"
+            },
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 159,
+            "description": "Collapse or restore the clicked comment's text.",
+            "itemtype": "method",
+            "name": "toggleClickedComment",
+            "params": [
+                {
+                    "name": "commentWrapper",
+                    "description": "Outer-level TR Element that wraps the\n                                clicked comment",
+                    "type": "Element"
+                },
+                {
+                    "name": "triggerElement",
+                    "description": "The clicked element / collapse trigger",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "true if the child comments should be collapsed, false\n                  if they should be displayed",
+                "type": "Boolean"
+            },
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 186,
+            "description": "Collapse the child comments of the target comment.\n\nAdds a unique id to the trigger element and to each collapsed comment\nso we can track which comments belong to which triggers.",
+            "itemtype": "method",
+            "name": "collapseChildComments",
+            "params": [
+                {
+                    "name": "targetComment",
+                    "description": "Comment which user requested to collapse",
+                    "type": "Element"
+                },
+                {
+                    "name": "triggerElement",
+                    "description": "Trigger element which user clicked",
+                    "type": "Element"
+                }
+            ],
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 213,
+            "description": "Restore the child comments associated with the trigger element.\n\nRemoves the unique id from the trigger element and any child comments.",
+            "itemtype": "method",
+            "name": "restoreChildComments",
+            "params": [
+                {
+                    "name": "triggerElement",
+                    "description": "Trigger element which user clicked",
+                    "type": "Element"
+                }
+            ],
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 241,
+            "description": "Delegate click handler which starts collapse or restore process when\na trigger element is clicked.",
+            "itemtype": "method",
+            "name": "clickHandler",
+            "params": [
+                {
+                    "name": "evt",
+                    "description": "",
+                    "type": "Event"
+                }
+            ],
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 269,
+            "description": "Get all child comments based on the passed in element.\n\nAs of July 08, 2015, comments on HN are displayed in individual TR\nelements rather than nested within each other.  The \"nesting\" is\nsolely controlled by a spacer element on the left of the TR which\nindents the content of the comment.\n\nThis function:\n\n1. finds all spacer elements\n2. filters out any that are above the target comment\n3. loops through in order and only keeps those that are of greater\n   indentation level than the target comment\n4. returns the parent top-level TR's for the remaining spacers\n\nThe following structure is assumed:\n  'tr.athing' = Top-level HN comment wrapper\n  'td.ind'    = indentation / spacer element located inside wrapper",
+            "itemtype": "method",
+            "name": "findChildComments",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "An HTML Element that either _is_ the target\n                         comment's TR wrapper or is an element within it.",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "list of comments (TR's) which are \"children\" of the target\n                comment",
+                "type": "Array"
+            },
+            "class": "hncollapse",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 370,
+            "description": "Get the absolute Y position of the target element",
+            "itemtype": "method",
+            "name": "getTop",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "Absolute Y position of the top of the element",
+                "type": "Number"
+            },
+            "class": "Util",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 381,
+            "description": "Highlight the target element.",
+            "itemtype": "method",
+            "name": "highlight",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "color",
+                    "description": "Default: 'blue'",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "class": "Util",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 402,
+            "description": "Return the parent element based on tagName.\nIf a list is passed, return a list of parent elements treating\neach source element as if it had been passed individually.",
+            "itemtype": "method",
+            "name": "findParent",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The child element or list of\n                                    child elements",
+                    "type": "Element | NodeList"
+                },
+                {
+                    "name": "tagName",
+                    "description": "HTML tag name of the parent element to find.\n                        May can also include a className to further\n                        refine search. ex. \"tr\", \"tr.comment\"",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "parent element or list of parent elements.\n                          If none found, returns undefined or list\n                          of undefined",
+                "type": "Element | Array"
+            },
+            "class": "Util",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 469,
+            "description": "Check if an element has the specified CSS class.",
+            "itemtype": "method",
+            "name": "hasClass",
+            "params": [
+                {
+                    "name": "el",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "className",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "true if element has specific class",
+                "type": "Boolean"
+            },
+            "class": "CSS",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 485,
+            "description": "Add the specified class to the target element.",
+            "itemtype": "method",
+            "name": "addClass",
+            "params": [
+                {
+                    "name": "el",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "className",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "CSS",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 500,
+            "description": "Remove the specified class from the target element.",
+            "itemtype": "method",
+            "name": "removeClass",
+            "params": [
+                {
+                    "name": "el",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "className",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "CSS",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 515,
+            "description": "Toggle the specified CSS class.  If the element already has it, it is\nremoved.  If not, it is added.",
+            "itemtype": "method",
+            "name": "toggleClass",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "className",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "CSS",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 535,
+            "description": "Get the \"outerWidth\" of an HTML element.",
+            "meteor": "outerWidth",
+            "params": [
+                {
+                    "name": "el",
+                    "description": "",
+                    "type": "Element"
+                }
+            ],
+            "return": {
+                "description": "offsetWidth + margins",
+                "type": "Number"
+            },
+            "class": "CSS",
+            "module": "hncollapse"
+        },
+        {
+            "file": "hncollapse.user.js",
+            "line": 550,
+            "description": "Add css to the page's HEAD.",
+            "itemtype": "method",
+            "name": "addGlobalStyle",
+            "params": [
+                {
+                    "name": "css",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "CSS",
+            "module": "hncollapse"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "unknown tag: meteor",
+            "line": " hncollapse.user.js:535"
+        },
+        {
+            "message": "Missing item type\nGet the \"outerWidth\" of an HTML element.",
+            "line": " hncollapse.user.js:535"
+        }
+    ]
+}

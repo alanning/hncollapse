@@ -1,0 +1,9 @@
+{
+  "name": "hncollapse",
+  "description": "Collapsible comments for Hacker News",
+  "version": "v0.1",
+  "options": {
+    "outdir": "./docs",
+    "paths": ["./"]
+  }
+}
