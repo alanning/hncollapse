@@ -21,7 +21,10 @@ Google Chrome has built-in support for user scripts:
 3. Drag the hncollapse.user.js file onto the tab
 4. Grant access
 
-I'm not too familiar with Greasemonkey so I had some trouble getting the script to actually run against the live HN comments page.  I'm not sure why, but to get it to work I had to make sure that `https://news.ycombinator.com/item` was set in the "Included Pages" section for both the "User Settings" and the "Script Settings" Greasemonkey tabs.  Hopefully it will load for you automatically if you install the script...
+
+## Install on other browsers
+
+I think IE and Safari also have Greasemonkey plugins but I haven't tested those.  Code is compatible with IE10+ and if you try with IE9 but have errors, submit a bug report and I'll fix it for IE9 as well.
 
 
 ## Repo description:
